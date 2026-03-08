@@ -73,7 +73,7 @@ async def auto_sender_task(user_id, chat_id, api_url, context: ContextTypes.DEFA
     while auto_sending_status.get(user_id, False):
         try:
             # একসাথে ২-৩টি মেইল পাঠাবে (মানুষের মতো আচরণ করার জন্য)
-            batch_limit = random.randint(2, 4)
+            batch_limit = random.randint(1)
             
             # Requests call কে async করা হয়েছে যেন বট হ্যাং না হয়
             res = await asyncio.to_thread(requests.post, api_url, json={"action": "send", "limit": batch_limit}, timeout=30)
@@ -90,7 +90,7 @@ async def auto_sender_task(user_id, chat_id, api_url, context: ContextTypes.DEFA
                     db.collection('client_data').document(str(user_id)).set({'total_sent': firestore.Increment(sent)}, merge=True)
                     
                     # রেন্ডম ডিলে (৬০ থেকে ১৮০ সেকেন্ড বা ১-৩ মিনিট)
-                    delay = random.randint(60, 180)
+                    delay = random.randint(180, 300)
                     next_time = delay // 60
                     await context.bot.send_message(chat_id=chat_id, text=f"✅ সফলভাবে **{sent}টি** ইমেইল পাঠানো হয়েছে!\n⏳ গুগলকে ফাঁকি দিতে বট এখন **{next_time} মিনিট** অপেক্ষা করবে, এরপর আবার পাঠাবে...", parse_mode='Markdown')
                     
